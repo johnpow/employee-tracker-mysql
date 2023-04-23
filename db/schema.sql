@@ -1,27 +1,32 @@
-DROP DATABASE IF EXISTS mysql_todos;
-CREATE DATABASE mysql_todos;
+DROP DATABASE IF EXISTS employee_tracker;
+CREATE DATABASE employee_tracker;
 
-USE mysql_todos;
+USE employee_tracker;
 
 
 
--- users should have an ID, firstName, lastName, password as columns. none of them can be null
--- make the ID the primary key
-
-CREATE TABLE users (
+CREATE TABLE department (
     id INT NOT NULL AUTO_INCREMENT,
-    firstName VARCHAR(255) NOT NULL,
-    lastName VARCHAR(255) NOT NULL,
-    password VARCHAR(255) NOT NULL,
+    name VARCHAR(30) NOT NULL,
     PRIMARY KEY (id)
 );
 
-CREATE TABLE todos (
+CREATE TABLE role (
     id INT NOT NULL AUTO_INCREMENT,
-    todo VARCHAR(255) NOT NULL,
-    completed BOOLEAN NOT NULL,
-    user_id INT NOT NULL,
+    title VARCHAR(30) NOT NULL,
+    salary DECIMAL NOT NULL,
+    department_id INT NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY(user_id) REFERENCES users(id)
+    FOREIGN KEY(department_id) REFERENCES department(id)
+);
 
+CREATE TABLE employee (
+    id INT NOT NULL AUTO_INCREMENT,
+    first_name VARCHAR(30) NOT NULL,
+    last_name VARCHAR(30) NOT NULL,
+    role_id INT NOT NULL,
+    manager_id INT,
+    PRIMARY KEY (id),
+    FOREIGN KEY(role_id) REFERENCES role(id),
+    FOREIGN KEY(manager_id) REFERENCES employee(id)
 );

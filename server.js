@@ -1,6 +1,7 @@
+const inquirer = require("inquirer");
 const express = require('express');
 const mysql = require('mysql2');
-const inquirer = require("inquirer");
+const cTable = require('console.table');
 
 const app = express();
 
@@ -9,42 +10,42 @@ const PORT = process.env.PORT || 3001;
 app.use(express.json());
 app.use(express.urlencoded({extended: true}))
 
-const connection = mysql.createConnection({
+const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     password: 'password',
-    database: 'mysql_todos'
+    database: 'employee_tracker'
 },
 console.log('connected to database')
 
 );
 
-// /api/users?firstName=John&lastName=Doe
+const questions = [
+    {
+      name: "departmentNum",
+      message: "What department do you want to see?",
+      response: "input",
+    }
+  ];
 
+function getStarted() {
+inquirer.prompt(questions).then((shapeData) => {
 
-app.get('/api/users', (req,res) => {
-    // SELECT * FROM USERS;
-        const query = "SELECT * FROM users WHERE ? = ? AND ? = ?;";
+    db.query('SELECT * FROM department WHERE id = ?;',
+        [shapeData.departmentNum], function (err, results) {
+        if (err) {
+          console.log(err);
+        }
+        console.table(results);
+        getStarted() 
+      });
     
-        connection.query(
-            query, [
-                Object.keys(req.query)[0], 
-                req.query[Object.keys(req.query)[0]],
-                Object.keys(req.query)[1], 
-                req.query[Object.keys(req.query)[1]],
-            ],(err, results) => {
-                if (err) {
-                    console.log(query);
-                    return res.status(500).json({err});
-                    
-                }
-                console.log(req.query[Object.keys(req.query)[1]]);
-                res.json(results);
-    
-        });
-    
-    })
+
+});
+
+};
+getStarted() 
 
 
 
-app.listen(PORT, () => console.log(`Server started on ${PORT}`))
+app.listen(PORT)
