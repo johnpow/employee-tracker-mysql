@@ -54,13 +54,10 @@ const questions = [
       return answers.userSelect === "Add a Department";
     },
   },
-
 ];
 
 function getStarted() {
-
   inquirer.prompt(questions).then((input) => {
-
     if (input.userSelect === "View all Departments") {
       db.query(departQuery, function (err, results) {
         if (err) {
@@ -93,175 +90,209 @@ function getStarted() {
         console.log(`Added ${input.newDept} to database.`);
         return getStarted();
       });
-    } 
-    else if (input.userSelect === "Add a Role") {
-        return addRole();
-     }
-     else if (input.userSelect === "Add an Employee") {
+    } else if (input.userSelect === "Add a Role") {
+      return addRole();
+    } else if (input.userSelect === "Add an Employee") {
       return addEmployee();
-   }
-   else if (input.userSelect === "Update an Employee Role") {
-    return updateEmployeeNew();
- }
-
-   
-    else if (input.userSelect === "Quit") {
+    } else if (input.userSelect === "Update an Employee Role") {
+      return updateEmployeeNew();
+    } else if (input.userSelect === "Quit") {
       process.exit();
     }
   });
 }
 
 function updateEmployeeNew() {
-
-  db.query('SELECT title FROM role;', function (err, results,fields) {
+  db.query("SELECT title FROM role;", function (err, results, fields) {
     if (err) {
       console.log(err);
     }
-    const roleFresh = results.map(function (el) { return el.title; });
-    db.query('SELECT CONCAT(first_name," ",last_name) as mgr FROM employee;', function (err, results,fields) {
-      if (err) {
-        console.log(err);
-      }
-    const managerFresh = results.map(function (el) { return el.mgr; });
-    console.log(managerFresh);
-      db.query('SELECT CONCAT(first_name," ",last_name) as empl FROM employee;', function (err, results,fields) {
+    const roleFresh = results.map(function (el) {
+      return el.title;
+    });
+    db.query(
+      'SELECT CONCAT(first_name," ",last_name) as mgr FROM employee;',
+      function (err, results, fields) {
         if (err) {
           console.log(err);
         }
-      const employeeFresh = results.map(function (el) { return el.empl; });
-      console.log(employeeFresh);
-    const employeeQuest = [
-      {
-        name: "pickEmployee",
-        message: "Which employee would you like to update?",
-        type: "rawlist",
-        choices: employeeFresh
-      },
-      {
-        name: "pickRole",
-        message: "What is their new role?",
-        type: "rawlist",
-        choices: roleFresh
-      },
-      {
-        name: "pickManager",
-        message: "Who is their new manager?",
-        type: "rawlist",
-        choices: managerFresh
-      },
-    ];
-    
-    inquirer.prompt(employeeQuest).then((stuff) => {
-      db.query('SELECT id FROM role WHERE title = ?', [stuff.pickRole], function (err, results,fields) {
-        if (err) {
-          console.log(err);
-        }
-            const roleId = results[0].id;
-            db.query('SELECT id FROM employee WHERE CONCAT(first_name," ",last_name) = ?', [stuff.pickManager], function (err, results,fields) {
-              if (err) {
-                console.log(err);
-              }
-              const mgrId = results[0].id;
-              db.query('SELECT id FROM employee WHERE CONCAT(first_name," ",last_name) = ?', [stuff.pickEmployee], function (err, results,fields) {
-                if (err) {
-                  console.log(err);
+        const managerFresh = results.map(function (el) {
+          return el.mgr;
+        });
+        db.query(
+          'SELECT CONCAT(first_name," ",last_name) as empl FROM employee;',
+          function (err, results, fields) {
+            if (err) {
+              console.log(err);
+            }
+            const employeeFresh = results.map(function (el) {
+              return el.empl;
+            });
+            const employeeQuest = [
+              {
+                name: "pickEmployee",
+                message: "Which employee would you like to update?",
+                type: "rawlist",
+                choices: employeeFresh,
+              },
+              {
+                name: "pickRole",
+                message: "What is their new role?",
+                type: "rawlist",
+                choices: roleFresh,
+              },
+              {
+                name: "pickManager",
+                message: "Who is their new manager?",
+                type: "rawlist",
+                choices: managerFresh,
+              },
+            ];
+
+            inquirer.prompt(employeeQuest).then((stuff) => {
+              db.query(
+                "SELECT id FROM role WHERE title = ?",
+                [stuff.pickRole],
+                function (err, results, fields) {
+                  if (err) {
+                    console.log(err);
+                  }
+                  const roleId = results[0].id;
+                  db.query(
+                    'SELECT id FROM employee WHERE CONCAT(first_name," ",last_name) = ?',
+                    [stuff.pickManager],
+                    function (err, results, fields) {
+                      if (err) {
+                        console.log(err);
+                      }
+                      const mgrId = results[0].id;
+                      db.query(
+                        'SELECT id FROM employee WHERE CONCAT(first_name," ",last_name) = ?',
+                        [stuff.pickEmployee],
+                        function (err, results, fields) {
+                          if (err) {
+                            console.log(err);
+                          }
+                          const empId = results[0].id;
+                          db.query(
+                            updateEmployee,
+                            [roleId, mgrId, empId],
+                            function (err, results, fields) {
+                              if (err) {
+                                console.log(err);
+                              }
+                              console.log(
+                                `Updated ${stuff.pickEmployee} in database`
+                              );
+                              return getStarted();
+                            }
+                          );
+                        }
+                      );
+                    }
+                  );
                 }
-                const empId = results[0].id;
-            db.query(updateEmployee, [roleId,mgrId,empId], function (err, results,fields) {
-              if (err) {
-                console.log(err);
-              }
-              console.log(`Updated ${stuff.pickEmployee} in database`)
-              return getStarted();
-    
-      });
-    })
-  })
-    });
-  
-    });
+              );
+            });
+          }
+        );
+      }
+    );
   });
-  });
-  });
-  };
-
-
-
+}
 
 function addEmployee() {
-
-db.query('SELECT title FROM role;', function (err, results,fields) {
-  if (err) {
-    console.log(err);
-  }
-  const roleFresh = results.map(function (el) { return el.title; });
-  db.query('SELECT CONCAT(first_name," ",last_name) as mgr FROM employee;', function (err, results,fields) {
+  db.query("SELECT title FROM role;", function (err, results, fields) {
     if (err) {
       console.log(err);
     }
-  const managerFresh = results.map(function (el) { return el.mgr; });
-  const employeeQuest = [
-    {
-      type: "input",
-      name: "firstName",
-      message: "What is their first name?",
-    },
-    {
-      type: "input",
-      name: "lastName",
-      message: "What is their last name?",
-    },
-    {
-      name: "pickRole",
-      message: "Which role do they have?",
-      type: "rawlist",
-      choices: roleFresh
-    },
-    {
-      name: "pickManager",
-      message: "Who is their manager?",
-      type: "rawlist",
-      choices: managerFresh
-    },
-  ];
-  
-  inquirer.prompt(employeeQuest).then((stuff) => {
-    db.query('SELECT id FROM role WHERE title = ?', [stuff.pickRole], function (err, results,fields) {
-      if (err) {
-        console.log(err);
-      }
-          const roleId = results[0].id;
-          db.query('SELECT id FROM employee WHERE CONCAT(first_name," ",last_name) = ?', [stuff.pickManager], function (err, results,fields) {
-            if (err) {
-              console.log(err);
-            }
-            const mgrId = results[0].id;
-            
-          db.query(newEmployee, [stuff.firstName, stuff.lastName, roleId,mgrId], function (err, results,fields) {
-            if (err) {
-              console.log(err);
-            }
-            console.log(`Added ${stuff.firstName} ${stuff.lastName} to database`)
-            return getStarted();
-  
+    const roleFresh = results.map(function (el) {
+      return el.title;
     });
-  })
-  });
+    db.query(
+      'SELECT CONCAT(first_name," ",last_name) as mgr FROM employee;',
+      function (err, results, fields) {
+        if (err) {
+          console.log(err);
+        }
+        const managerFresh = results.map(function (el) {
+          return el.mgr;
+        });
+        const employeeQuest = [
+          {
+            type: "input",
+            name: "firstName",
+            message: "What is their first name?",
+          },
+          {
+            type: "input",
+            name: "lastName",
+            message: "What is their last name?",
+          },
+          {
+            name: "pickRole",
+            message: "Which role do they have?",
+            type: "rawlist",
+            choices: roleFresh,
+          },
+          {
+            name: "pickManager",
+            message: "Who is their manager?",
+            type: "rawlist",
+            choices: managerFresh,
+          },
+        ];
 
-  });
-});
-});
+        inquirer.prompt(employeeQuest).then((stuff) => {
+          db.query(
+            "SELECT id FROM role WHERE title = ?",
+            [stuff.pickRole],
+            function (err, results, fields) {
+              if (err) {
+                console.log(err);
+              }
+              const roleId = results[0].id;
+              db.query(
+                'SELECT id FROM employee WHERE CONCAT(first_name," ",last_name) = ?',
+                [stuff.pickManager],
+                function (err, results, fields) {
+                  if (err) {
+                    console.log(err);
+                  }
+                  const mgrId = results[0].id;
 
-};
+                  db.query(
+                    newEmployee,
+                    [stuff.firstName, stuff.lastName, roleId, mgrId],
+                    function (err, results, fields) {
+                      if (err) {
+                        console.log(err);
+                      }
+                      console.log(
+                        `Added ${stuff.firstName} ${stuff.lastName} to database`
+                      );
+                      return getStarted();
+                    }
+                  );
+                }
+              );
+            }
+          );
+        });
+      }
+    );
+  });
+}
 
 function addRole() {
-
-  db.query('SELECT title FROM role', function (err, results,fields) {
+  db.query("SELECT name FROM department", function (err, results, fields) {
     if (err) {
       console.log(err);
     }
-    const deptFresh = results.map(function (el) { return el.name; });
-  
+    const deptFresh = results.map(function (el) {
+      return el.name;
+    });
+
     const roleQuest = [
       {
         type: "input",
@@ -277,37 +308,32 @@ function addRole() {
         name: "newRoleDept",
         message: "What department does it belong to?",
         type: "rawlist",
-        choices: deptFresh
+        choices: deptFresh,
       },
     ];
-    
+
     inquirer.prompt(roleQuest).then((stuff) => {
-      db.query(departNum, [stuff.newRoleDept], function (err, results,fields) {
+      db.query(departNum, [stuff.newRoleDept], function (err, results, fields) {
         if (err) {
           console.log(err);
         }
-    
-            const deptId = results[0].id;
-    
-            db.query(newRole, [stuff.newRole, stuff.newRoleSalary, deptId], function (err, results,fields) {
-              if (err) {
-                console.log(err);
-              }
-              console.log(`Added ${stuff.newRole} to database`)
-              return getStarted();
-    
+        const deptId = results[0].id;
+
+        db.query(
+          newRole,
+          [stuff.newRole, stuff.newRoleSalary, deptId],
+          function (err, results, fields) {
+            if (err) {
+              console.log(err);
+            }
+            console.log(`Added ${stuff.newRole} to database`);
+            return getStarted();
+          }
+        );
       });
-    
-    })
-    
     });
   });
-  
-  
-  };
-
-
-
+}
 
 getStarted();
 

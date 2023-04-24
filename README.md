@@ -10,6 +10,10 @@ This employee tracker helps business owners view and manage the departments, rol
 - [Access](#access)
 
 ## Usage
+- Run the application by using the following command:
+```bash
+node server.js
+```
 - Select the option you would like to proceed with (view/add/update)
 - Follow the prompts to successfully keep your data up-to-date
 - Enjoy having all the information saved in one place
@@ -29,4 +33,4 @@ This was based off of learnings from a course with topic regarding Express.js, M
 ## Access
 [Click to View Repository](https://github.com/johnpow/employee-tracker-mysql)
 
-[Click for Video Walkthrough](www.google.com)
+[Click for Video Walkthrough](https://drive.google.com/file/d/1-EacTZGCO4SaPEtxUZLWjojAPrmUY8rJ/view)
