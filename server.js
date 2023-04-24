@@ -27,7 +27,7 @@ const db = mysql.createConnection(
     password: "password",
     database: "employee_tracker",
   },
-  console.log("connected to database")
+  console.log("\\\\ Welcome to Employee Tracker! //")
 );
 
 const questions = [

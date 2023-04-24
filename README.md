@@ -1,7 +1,7 @@
-# Note Taker
+# Employee Tracker
 
 ## Description
-This note taker allows user the save and retrieve their most important notes! The data is stored in a database so the list will stick around. The UI allows users to delete old notes.
+This employee tracker helps business owners view and manage the departments, roles, and employees in their companies so that they can organize and plan their businesses. 
 
 ## Table of Contents
 - [Usage](#usage)
@@ -10,23 +10,23 @@ This note taker allows user the save and retrieve their most important notes! Th
 - [Access](#access)
 
 ## Usage
-- Click "Get Started" at the landing page
-- Use the + to add a new note and use the save icon to save after writing
-- Reopen old notes by clicking note in left pane
-- Delete note by clicking the trash can icon
+- Select the option you would like to proceed with (view/add/update)
+- Follow the prompts to successfully keep your data up-to-date
+- Enjoy having all the information saved in one place
+- Use quit option to exit and changes will be saved!
 
-![user experience](./images/notes.png)
+![user experience](./images/terminal.png)
 
 
 ## Credits
-The backend was built by me and the front-end came from [starter code](https://github.com/coding-boot-camp/miniature-eureka).
+This was based off of learnings from a course with topic regarding Express.js, MySQL, and Inquirer packages. 
 
 ## Features
-- Add, Store, Delete your favorite notes
-- No frill note taker
+- View database tables and make changes!
+- Easily update roles and managers when employees shift around
 - Use and enjoy!
 
 ## Access
-Click to view repository: [Note Taker](https://github.com/johnpow/note-taker).
+[Click to View Repository](https://github.com/johnpow/employee-tracker-mysql)
 
-Deployed Site: [Note Taker](https://vast-inlet-18412.herokuapp.com/).
+[Click for Video Walkthrough](www.google.com)
