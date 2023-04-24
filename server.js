@@ -51,30 +51,7 @@ const questions = [
       return answers.userSelect === "Add a Department";
     },
   },
-  {
-    type: "input",
-    name: "newRole",
-    message: "What should the new role be called?",
-    when(answers) {
-      return answers.userSelect === "Add a Role";
-    },
-  },
-  {
-    type: "input",
-    name: "newRoleSalary",
-    message: "How much does the role make?",
-    when(answers) {
-      return answers.userSelect === "Add a Role";
-    },
-  },
-  {
-    type: "input",
-    name: "newRoleDept",
-    message: "What department does it belong to?",
-    when(answers) {
-      return answers.userSelect === "Add a Role";
-    },
-  },
+
 ];
 
 function getStarted() {
@@ -110,37 +87,63 @@ function getStarted() {
         if (err) {
           console.log(err);
         }
-          db.query(departQuery, function (err, results) {
-            if (err) {
-              console.log(err);
-            }
-            console.table(results);
-            return getStarted();
-          });
+        console.log(`Added ${input.newDept} to database.`);
+        return getStarted();
       });
     } 
     else if (input.userSelect === "Add a Role") {
-      
-      db.query(departNum, [input.newRoleDept], function (err, results,fields) {
-        if (err) {
-          console.log(err);
-        }
-  
-            const deptId = results[0].id;
-
-            db.query(newRole, [input.newRole, input.newRoleSalary, deptId], function (err, results,fields) {
-              if (err) {
-                console.log(err);
-              }
-            
-              return getStarted();
-
-      });
-
-    })
+        return addRole();
      }
   });
 }
+
+function addRole() {
+
+const roleQuest = [
+  {
+    type: "input",
+    name: "newRole",
+    message: "What should the new role be called?",
+  },
+  {
+    type: "input",
+    name: "newRoleSalary",
+    message: "How much does the role make?",
+  },
+  {
+    name: "newRoleDept",
+    message: "What department does it belong to?",
+    type: "rawlist",
+    choices: [
+      "Recruiting",
+      "Engineering",
+    ]
+  },
+];
+
+inquirer.prompt(roleQuest).then((stuff) => {
+  db.query(departNum, [stuff.newRoleDept], function (err, results,fields) {
+    if (err) {
+      console.log(err);
+    }
+
+        const deptId = results[0].id;
+
+        db.query(newRole, [stuff.newRole, stuff.newRoleSalary, deptId], function (err, results,fields) {
+          if (err) {
+            console.log(err);
+          }
+        
+          return getStarted();
+
+  });
+
+})
+
+});
+};
+
+
 getStarted();
 
 app.listen(PORT);
