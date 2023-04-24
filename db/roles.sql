@@ -1,0 +1,1 @@
+'SELECT DISTINCT c.id, c.title, c.salary, d.name as department FROM role c LEFT JOIN department d ON c.department_id = d.id;'
