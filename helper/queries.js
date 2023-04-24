@@ -8,7 +8,8 @@ const departNum = "SELECT id FROM department WHERE name = ?;";
 const newRole = "INSERT INTO role(title,salary,department_id) VALUES (?,?,?);";
 const newEmployee =
   "INSERT INTO employee(first_name,last_name,role_id,manager_id) VALUES (?,?,?,?);";
-
+const updateEmployee =
+ "UPDATE employee SET role_id = ?, manager_id = ? WHERE id =?;"
 
 
 module.exports = {
@@ -19,4 +20,5 @@ module.exports = {
   departNum,
   newRole,
   newEmployee,
+  updateEmployee,
 };
