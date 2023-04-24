@@ -8,6 +8,7 @@ const {
   employeesQ,
   newDept,
   departNum,
+  newRole,
 } = require("./helper/queries.js");
 
 const app = express();
@@ -125,11 +126,18 @@ function getStarted() {
           console.log(err);
         }
   
-            console.log(results[0].id);
-            return getStarted();
+            const deptId = results[0].id;
+
+            db.query(newRole, [input.newRole, input.newRoleSalary, deptId], function (err, results,fields) {
+              if (err) {
+                console.log(err);
+              }
+            
+              return getStarted();
+
       });
 
- 
+    })
      }
   });
 }
