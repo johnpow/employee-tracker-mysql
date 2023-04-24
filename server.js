@@ -99,48 +99,54 @@ function getStarted() {
 
 function addRole() {
 
-const roleQuest = [
-  {
-    type: "input",
-    name: "newRole",
-    message: "What should the new role be called?",
-  },
-  {
-    type: "input",
-    name: "newRoleSalary",
-    message: "How much does the role make?",
-  },
-  {
-    name: "newRoleDept",
-    message: "What department does it belong to?",
-    type: "rawlist",
-    choices: [
-      "Recruiting",
-      "Engineering",
-    ]
-  },
-];
+db.query('SELECT name FROM department', function (err, results,fields) {
+  if (err) {
+    console.log(err);
+  }
+  const deptFresh = results.map(function (el) { return el.name; });
 
-inquirer.prompt(roleQuest).then((stuff) => {
-  db.query(departNum, [stuff.newRoleDept], function (err, results,fields) {
-    if (err) {
-      console.log(err);
-    }
-
-        const deptId = results[0].id;
-
-        db.query(newRole, [stuff.newRole, stuff.newRoleSalary, deptId], function (err, results,fields) {
-          if (err) {
-            console.log(err);
-          }
-        
-          return getStarted();
-
+  const roleQuest = [
+    {
+      type: "input",
+      name: "newRole",
+      message: "What should the new role be called?",
+    },
+    {
+      type: "input",
+      name: "newRoleSalary",
+      message: "How much does the role make?",
+    },
+    {
+      name: "newRoleDept",
+      message: "What department does it belong to?",
+      type: "rawlist",
+      choices: deptFresh
+    },
+  ];
+  
+  inquirer.prompt(roleQuest).then((stuff) => {
+    db.query(departNum, [stuff.newRoleDept], function (err, results,fields) {
+      if (err) {
+        console.log(err);
+      }
+  
+          const deptId = results[0].id;
+  
+          db.query(newRole, [stuff.newRole, stuff.newRoleSalary, deptId], function (err, results,fields) {
+            if (err) {
+              console.log(err);
+            }
+          
+            return getStarted();
+  
+    });
+  
+  })
+  
   });
-
-})
-
 });
+
+
 };
 
 
