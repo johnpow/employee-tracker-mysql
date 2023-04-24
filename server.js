@@ -9,6 +9,7 @@ const {
   newDept,
   departNum,
   newRole,
+  newEmployee,
 } = require("./helper/queries.js");
 
 const app = express();
@@ -41,6 +42,7 @@ const questions = [
       "Add a Role",
       "Add an Employee",
       "Update an Employee Role",
+      "Quit",
     ],
   },
   {
@@ -94,60 +96,136 @@ function getStarted() {
     else if (input.userSelect === "Add a Role") {
         return addRole();
      }
+     else if (input.userSelect === "Add an Employee") {
+      return addEmployee();
+   }
+    else if (input.userSelect === "Quit") {
+      process.exit();
+    }
   });
 }
 
-function addRole() {
+function addEmployee() {
 
-db.query('SELECT name FROM department', function (err, results,fields) {
+db.query('SELECT title FROM role;', function (err, results,fields) {
   if (err) {
     console.log(err);
   }
-  const deptFresh = results.map(function (el) { return el.name; });
-
-  const roleQuest = [
+  const roleFresh = results.map(function (el) { return el.title; });
+  console.log(roleFresh);
+  db.query('SELECT CONCAT(first_name," ",last_name) as mgr FROM employee;', function (err, results,fields) {
+    if (err) {
+      console.log(err);
+    }
+  const managerFresh = results.map(function (el) { return el.mgr; });
+  console.log(managerFresh);
+  const employeeQuest = [
     {
       type: "input",
-      name: "newRole",
-      message: "What should the new role be called?",
+      name: "firstName",
+      message: "What is their first name?",
     },
     {
       type: "input",
-      name: "newRoleSalary",
-      message: "How much does the role make?",
+      name: "lastName",
+      message: "What is their last name?",
     },
     {
-      name: "newRoleDept",
-      message: "What department does it belong to?",
+      name: "pickRole",
+      message: "Which role do they have?",
       type: "rawlist",
-      choices: deptFresh
+      choices: roleFresh
+    },
+    {
+      name: "pickManager",
+      message: "Who is their manager?",
+      type: "rawlist",
+      choices: managerFresh
     },
   ];
   
-  inquirer.prompt(roleQuest).then((stuff) => {
-    db.query(departNum, [stuff.newRoleDept], function (err, results,fields) {
+  inquirer.prompt(employeeQuest).then((stuff) => {
+    db.query('SELECT id FROM role WHERE title = ?', [stuff.pickRole], function (err, results,fields) {
       if (err) {
         console.log(err);
       }
-  
-          const deptId = results[0].id;
-  
-          db.query(newRole, [stuff.newRole, stuff.newRoleSalary, deptId], function (err, results,fields) {
+          const roleId = results[0].id;
+          db.query('SELECT id FROM employee WHERE CONCAT(first_name," ",last_name) = ?', [stuff.pickManager], function (err, results,fields) {
             if (err) {
               console.log(err);
             }
-          
+            const mgrId = results[0].id;
+            
+          db.query(newEmployee, [stuff.firstName, stuff.lastName, roleId,mgrId], function (err, results,fields) {
+            if (err) {
+              console.log(err);
+            }
+            console.log(`Added ${stuff.firstName} ${stuff.lastName} to database`)
             return getStarted();
   
     });
-  
   })
-  
+  });
+
   });
 });
-
+});
 
 };
+
+function addRole() {
+
+  db.query('SELECT title FROM role', function (err, results,fields) {
+    if (err) {
+      console.log(err);
+    }
+    const deptFresh = results.map(function (el) { return el.name; });
+  
+    const roleQuest = [
+      {
+        type: "input",
+        name: "newRole",
+        message: "What should the new role be called?",
+      },
+      {
+        type: "input",
+        name: "newRoleSalary",
+        message: "How much does the role make?",
+      },
+      {
+        name: "newRoleDept",
+        message: "What department does it belong to?",
+        type: "rawlist",
+        choices: deptFresh
+      },
+    ];
+    
+    inquirer.prompt(roleQuest).then((stuff) => {
+      db.query(departNum, [stuff.newRoleDept], function (err, results,fields) {
+        if (err) {
+          console.log(err);
+        }
+    
+            const deptId = results[0].id;
+    
+            db.query(newRole, [stuff.newRole, stuff.newRoleSalary, deptId], function (err, results,fields) {
+              if (err) {
+                console.log(err);
+              }
+              console.log(`Added ${stuff.newRole} to database`)
+              return getStarted();
+    
+      });
+    
+    })
+    
+    });
+  });
+  
+  
+  };
+
+
 
 
 getStarted();
